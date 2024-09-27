@@ -1,0 +1,59 @@
+//add to cart with seal subscription
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to update the Add to Cart button with the total price
+    function updatePrice() {
+        // Select the price element from the product price main
+        const priceElement = document.querySelector('.product__price__main .money');
+        
+        if (priceElement) {
+            const priceValue = parseFloat(priceElement.textContent.trim().replace(/[$,]/g, '')); // Get the price value as a number
+            const addToCartPriceElement = document.querySelector('.btn--add-to-cart span.btn--add-to-cart-price');
+            const quantityInput = document.querySelector('.quantity__wrapper .quantity__input');
+
+            if (addToCartPriceElement && quantityInput) {
+                const quantity = parseInt(quantityInput.value, 10) || 1; // Get the current quantity
+
+                const totalPrice = (priceValue * quantity).toFixed(2); // Calculate the total price
+                addToCartPriceElement.textContent = `$${totalPrice}`; // Update the button with the total price
+            } else {
+                console.error("Add-to-Cart price element or quantity input not found");
+            }
+        } else {
+            console.error("Price element not found");
+        }
+    }
+
+    // Initial price update
+    setTimeout(updatePrice, 1000);
+
+    // Listen for changes in the quantity input
+    const quantityInput = document.querySelector('.quantity__wrapper .quantity__input');
+
+    if (quantityInput) {
+        // Listen for 'change' or 'input' events (depending on how the other script is modifying the quantity)
+        quantityInput.addEventListener('input', function() {
+            updatePrice(); // Update the price when the quantity is changed
+        });
+
+        quantityInput.addEventListener('change', function() {
+            updatePrice(); // Also trigger the update on change events
+        });
+    }
+
+    // Optional: If the price can change dynamically, you can set up a MutationObserver
+    const priceObserver = new MutationObserver(updatePrice);
+    const priceContainer = document.querySelector('.product__price__main');
+    
+    if (priceContainer) {
+        priceObserver.observe(priceContainer, {
+            childList: true,
+            subtree: true
+        });
+    } else {
+        console.error("Price container not found for MutationObserver");
+    }
+});
+</script>
